@@ -1,0 +1,9 @@
+sudo: required
+language: go1.12
+services:
+  - docker
+script:
+  - docker --version
+  - pip install --user awscli
+  - export PATH=$PATH:$HOME/.local/bin
+  - docker-compose -f docker-compose.prod.yml build
