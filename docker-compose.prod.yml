@@ -6,5 +6,4 @@ services:
       dockerfile: Dockerfile-prod
     ports:
       - 8090:8090
-    image:
-      - 668941285766.dkr.ecr.eu-west-2.amazonaws.com/image-recognition:latest
+    image: image-recognition

@@ -40,7 +40,7 @@ COPY . .
 
 EXPOSE 8090
 
-RUN go go test ./...
+RUN go test ./...
 RUN go build
 RUN go install
 
