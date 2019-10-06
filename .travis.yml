@@ -9,4 +9,6 @@ script:
   - eval $(aws ecr get-login --no-include-email --region eu-west-2)
   - docker-compose -f docker-compose.prod.yml build
   - docker tag image-recognition:latest 668941285766.dkr.ecr.eu-west-2.amazonaws.com/image-recognition:latest
-  - docker push 668941285766.dkr.ecr.eu-west-2.amazonaws.com/image-recognition:latest
+after_success:
+  - test $TRAVIS_BRANCH = "master" &&
+    docker push 668941285766.dkr.ecr.eu-west-2.amazonaws.com/image-recognition:latest
