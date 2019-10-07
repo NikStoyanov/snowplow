@@ -44,4 +44,4 @@ RUN go test ./...
 RUN go build
 RUN go install
 
-CMD ["captionthis"]
+CMD ["image-recognition"]
