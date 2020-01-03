@@ -28,6 +28,13 @@ func (a ByProbability) Less(i, j int) bool {
 func FindBestLabels(probabilities []float32, labels []string) []LabelResult {
 	// Make a list of label/probability pairs
 	var resultLabels []LabelResult
+
+	// Check if labels are returned from the model.
+	if len(labels) == 0 {
+		resultLabels = append(resultLabels, LabelResult{Label: "-1", Probability: 1.0})
+		return resultLabels
+	}
+
 	for i, p := range probabilities {
 		if i >= len(labels) {
 			break
