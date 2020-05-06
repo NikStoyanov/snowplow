@@ -13,8 +13,10 @@ import (
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/nikstoyanov/image-recognition/probability"
+	"github.com/nikstoyanov/image-recognition/sntracker"
 	"github.com/nikstoyanov/image-recognition/utils"
 	"github.com/rs/cors"
+	sp "github.com/snowplow/snowplow-golang-tracker/v2/tracker"
 	tf "github.com/tensorflow/tensorflow/tensorflow/go"
 )
 
@@ -29,9 +31,13 @@ var (
 	graphModel   *tf.Graph
 	sessionModel *tf.Session
 	labels       []string
+	tracker      *sp.Tracker
 )
 
 func main() {
+	// Initiate tracking
+	tracker = sntracker.SetupTracker()
+
 	// Initiate Inception model
 	if err := LoadModel(); err != nil {
 		log.Fatal(err)
@@ -49,7 +55,7 @@ func main() {
 // loadModel initiates the Inception CNN and the labels
 func LoadModel() error {
 	// Load inception model
-	model, err := ioutil.ReadFile("/model/tensorflow_inception_graph.pb")
+	model, err := ioutil.ReadFile("./model/tensorflow_inception_graph.pb")
 
 	if err != nil {
 		return err
@@ -66,7 +72,7 @@ func LoadModel() error {
 	}
 
 	// Load labels
-	labelsFile, err := os.Open("/model/imagenet_comp_graph_label_strings.txt")
+	labelsFile, err := os.Open("./model/imagenet_comp_graph_label_strings.txt")
 
 	if err != nil {
 		return err
@@ -115,8 +121,12 @@ func recognizeHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Param
 	// Check the type of the uploaded file
 	imageName := strings.Split(header.Filename, ".")
 
+	// Record the request for a new image
+	sntracker.TrackNewImage(tracker, imageName[0])
+
 	if imageName[1] != "jpg" && imageName[1] != "png" {
 		utils.ResponseError(w, "The file must be JPG or PNG!", http.StatusBadGateway)
+		sntracker.TrackWrongExt(tracker, imageName[1])
 		return
 	}
 
@@ -150,8 +160,11 @@ func recognizeHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Param
 	}
 
 	// Return best labels
+	bestLabels := probability.FindBestLabels(output[0].Value().([][]float32)[0], labels)
+	sntracker.TrackLabels(tracker, bestLabels)
+
 	utils.ResponseJSON(w, ClassifyResult{
 		Filename: header.Filename,
-		Labels:   probability.FindBestLabels(output[0].Value().([][]float32)[0], labels),
+		Labels:   bestLabels,
 	})
 }

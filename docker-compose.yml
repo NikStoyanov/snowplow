@@ -1,8 +1,0 @@
-version: '3'
-services:
-  image-recognition:
-    build: './image-recognition'
-    ports:
-      - 8090:8090
-    volumes:
-      - ./image-recognition:/image-recognition
