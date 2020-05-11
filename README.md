@@ -49,10 +49,9 @@ To track the stored events use httpie to provide a nice layout and run:
 http localhost:9090/micro/good
 ```
 
-## Docker compose bug
-First attempt used the existing [source code](https://github.com/NikStoyanov/image-recognition) for the image
-recognition which is developed using Docker. When configured the code would run
-with Snowplow micro, however, an error message of *-1* was returned for the
-status code. This points to
-https://github.com/snowplow/snowplow-golang-tracker/blob/50e2f03c3f5c2afb6b3b252d49ab75af987e1b52/tracker/emitter.go#L358
-not returning a valid error code.
+## Use Docker
+Over the weekend 8-10 May Snowplow micro was added to the origin of this repository.
+If easier it can be used instead as deployment is done through Docker.
+
+You can access the origin here: https://github.com/NikStoyanov/image-recognition and run `make` to deploy.
+The relevant Snowplow micro commit is: https://github.com/NikStoyanov/image-recognition/commit/fe79eb8f8225158e4a1e58eb1104058cb4060309
